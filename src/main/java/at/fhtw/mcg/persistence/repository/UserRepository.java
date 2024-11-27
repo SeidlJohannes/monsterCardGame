@@ -11,7 +11,7 @@ public interface UserRepository {
     User findById(int id);
     List<User> findAllUser();
     //void create(Weather weather);
-
-
+    User findByUsername(String username);
+    boolean existsByUsername(String username);
     User saveUser(User user);
 }

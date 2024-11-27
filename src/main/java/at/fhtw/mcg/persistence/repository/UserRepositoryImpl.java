@@ -14,7 +14,8 @@ import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
 
-    private List<User> userList;
+    private List<User> userList = new ArrayList<>();
+
 
     private UnitOfWork unitOfWork;
 
@@ -53,11 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findAllUser() {
-        return List.of(User.builder().
-                id(1).
-                username("user1").
-                password("pw1").
-                build());
+        return userList;
         /*try (PreparedStatement preparedStatement =
                      this.unitOfWork.prepareStatement("""
                     select * from weather
@@ -87,8 +84,40 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public boolean existsByUsername(String username) {
+        return userList.stream()
+                .anyMatch(user -> user.getUsername().equalsIgnoreCase(username));
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        if (username == null || username.isEmpty()) {
+            System.out.println("Invalid username provided for lookup.");
+            return null;
+        }
+
+        System.out.println("Looking for username: " + username);
+
+        // Search for the user in the list
+        for (User user : userList) {
+            System.out.println("Comparing with stored username: " + user.getUsername());
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                System.out.println("Match found for username: " + username);
+                return user;
+            }
+        }
+
+        System.out.println("No match found for username: " + username);
+        return null;
+    }
+
+
+
+    @Override
     public User saveUser(User user) {
+        userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername()));
         userList.add(user);
+        userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername()));
         return user;
     }
 }
