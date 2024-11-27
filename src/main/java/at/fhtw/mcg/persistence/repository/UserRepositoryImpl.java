@@ -1,5 +1,6 @@
 package at.fhtw.mcg.persistence.repository;
 
+import at.fhtw.httpserver.server.Request;
 import at.fhtw.mcg.model.Card;
 import at.fhtw.mcg.model.User;
 import at.fhtw.mcg.persistence.DataAccessException;
@@ -9,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {

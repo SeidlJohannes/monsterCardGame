@@ -44,7 +44,11 @@ public class UserService extends AbstractService {
 
     // POST /user
     public Response addUser(Request request) {
-        return new Response(HttpStatus.NOT_IMPLEMENTED);
+        System.out.println("addUserToRepository"); //print in main
+        User newUser = User.builder().build();
+        userRepository.saveUser(newUser);
+
+        return new Response(HttpStatus.OK, ContentType.PLAIN_TEXT, "User added!");
     }
 
     // GET /user
