@@ -1,0 +1,54 @@
+@startuml
+' Define main classes
+class User {
+    + username: String
+    + password: String
+    + coins: Integer = 20
+    + stack: List<Card>
+    + deck: List<Card>
+    + elo: Integer = 100
+    + token: String
+    + register()
+    + login()
+    + buyPackage()
+    + defineDeck()
+    + battle(opponent: User)
+    + tradeCard(card: Card, offeredCard: Card)
+    + getStats(): String
+}
+
+class Card {
+    + name: String
+    + damage: Float
+    + elementType: ElementType
+    + isSpell: Boolean
+}
+
+class Package {
+    + cards: List<Card> (size = 5)
+}
+
+class Battle {
+    - player1: User
+    - player2: User
+    + start()
+    + calculateWinner(): User
+}
+
+class ScoreBoard {
+    + stats: Map<User, Integer>
+    + display()
+    + updateStats(winner: User, loser: User)
+}
+
+
+' Relationships
+User --> Card: owns *
+User --> Package: buys
+Package --> Card: contains *
+User --> ScoreBoard: updates ELO
+Battle --> User: involves 2 players
+ScoreBoard --> User: ranks
+
+
+@enduml
