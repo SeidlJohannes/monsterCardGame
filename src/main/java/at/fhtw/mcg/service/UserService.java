@@ -17,14 +17,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@RequiredArgsConstructor
+
 public class UserService extends AbstractService {
 
     private ObjectMapper objectMapper = new ObjectMapper();
     private final UserRepository userRepository;
 
-    public UserService() {
-        userRepository = new UserRepositoryImpl(new UnitOfWork());
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     // GET /user(:id
@@ -91,7 +91,7 @@ public class UserService extends AbstractService {
     // GET /user
     public Response getUserPerRepository() {
         System.out.println("getUserPerRepository"); //print in main
-        User user = new User(1,"user1","pw1", 20,new ArrayList<Card>(),new ArrayList<Card>(),1111);
+        //User user = new User(1,"user1","pw1", 20,new ArrayList<Card>(),new ArrayList<Card>(),1111);
         String json = null;
         try {
             List<User> userJson = userRepository.findAllUser();

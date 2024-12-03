@@ -26,7 +26,7 @@ public class User {
     @JsonAlias({"deck"})
     private ArrayList<Card> deck; //consists of 4 cards picked from stack
     @JsonAlias({"token"})
-    private float token;
+    private String token;
 
     private void buildDeck(){};
     private void buyPackage(){};

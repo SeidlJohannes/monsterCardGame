@@ -6,12 +6,15 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.RestController;
+import at.fhtw.mcg.persistence.repository.UserRepository;
 import at.fhtw.mcg.service.SessionService;
 
 public class SessionController implements RestController {
     private final SessionService sessionService;
 
-    public SessionController() {this.sessionService = new SessionService();}
+    public SessionController(UserRepository userRepository) {
+        this.sessionService = new SessionService(userRepository);
+    }
 
     @Override
     public Response handleRequest(Request request) {

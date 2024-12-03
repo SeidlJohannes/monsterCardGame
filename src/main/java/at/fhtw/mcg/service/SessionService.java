@@ -14,14 +14,13 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 
-@RequiredArgsConstructor
 public class SessionService extends AbstractService {
 
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SessionService() {
-        userRepository = new UserRepositoryImpl(new UnitOfWork());
+    public SessionService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     // GET /user(:id
@@ -44,7 +43,7 @@ public class SessionService extends AbstractService {
 
     // POST /user
     public Response login(Request request) {
-        System.out.println("Login attempt"); // Debug log
+        //System.out.println("Login attempt"); // Debug log
         String body = request.getBody();
 
         // Check if request body is empty
@@ -72,6 +71,7 @@ public class SessionService extends AbstractService {
 
             // Generate token in the format "username-mtcgToken"
             String token = existingUser.getUsername() + "-mtcgToken";
+            userRepository.addToken(existingUser.getUsername(),token);
 
             // Return token as JSON response
             String jsonResponse = "{\"token\": \"" + token + "\"}";

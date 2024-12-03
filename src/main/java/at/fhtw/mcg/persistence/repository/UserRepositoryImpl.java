@@ -44,7 +44,7 @@ public class UserRepositoryImpl implements UserRepository {
                         resultSet.getInt(4),
                         (ArrayList<Card>) resultSet.getArray(20),
                         (ArrayList<Card>) resultSet.getArray(4),
-                        resultSet.getFloat(1234));
+                        resultSet.getString(1234));
             }
             return weather;
         } catch (SQLException e) {
@@ -96,18 +96,20 @@ public class UserRepositoryImpl implements UserRepository {
             return null;
         }
 
-        System.out.println("Looking for username: " + username);
+        //System.out.println("Looking for username: " + username); //Debug
+
+        //userList.forEach(user1 -> System.out.println("Stored usernames: " + username)); //Debug
 
         // Search for the user in the list
         for (User user : userList) {
-            System.out.println("Comparing with stored username: " + user.getUsername());
+            //System.out.println("Comparing with stored username: " + user.getUsername()); //Debug
             if (user.getUsername().equalsIgnoreCase(username)) {
-                System.out.println("Match found for username: " + username);
+                //System.out.println("Match found for username: " + username); //Debug
                 return user;
             }
         }
 
-        System.out.println("No match found for username: " + username);
+        //System.out.println("No match found for username: " + username); //Debug
         return null;
     }
 
@@ -115,9 +117,16 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User saveUser(User user) {
-        userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername()));
+        //userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername())); //Debug
         userList.add(user);
-        userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername()));
+        System.out.println("User is registered");
+        //userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername())); //Debug
         return user;
+    }
+
+    @Override
+    public void addToken(String username, String token) {
+        User foundUser = findByUsername(username);
+        foundUser.setToken(token);
     }
 }

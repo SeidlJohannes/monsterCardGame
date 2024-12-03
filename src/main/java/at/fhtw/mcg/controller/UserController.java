@@ -6,13 +6,14 @@ import at.fhtw.httpserver.http.Method;
 import at.fhtw.httpserver.server.Request;
 import at.fhtw.httpserver.server.Response;
 import at.fhtw.httpserver.server.RestController;
+import at.fhtw.mcg.persistence.repository.UserRepository;
 import at.fhtw.mcg.service.UserService;
 
 public class UserController implements RestController {
     private final UserService userService;
 
-    public UserController() {
-        this.userService = new UserService();
+    public UserController(UserRepository userRepository) {
+        this.userService = new UserService(userRepository);
     }
 
     @Override
