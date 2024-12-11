@@ -5,17 +5,22 @@ import at.fhtw.mcg.model.Card;
 import at.fhtw.mcg.model.User;
 import at.fhtw.mcg.persistence.DataAccessException;
 import at.fhtw.mcg.persistence.UnitOfWork;
+import at.fhtw.sampleapp.persistence.repository.WeatherRepository;
+import at.fhtw.sampleapp.persistence.repository.WeatherRepositoryImpl;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
 
     private List<User> userList = new ArrayList<>();
-
 
     private UnitOfWork unitOfWork;
 
@@ -26,61 +31,37 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(int id) {
-        try (PreparedStatement preparedStatement =
-                     this.unitOfWork.prepareStatement("""
-                    select * from public.weather
-                    where id = ?
-                """))
-        {
-            preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            User weather = null;
-            while(resultSet.next())
-            {
-                weather = new User(
-                        resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getInt(4),
-                        (ArrayList<Card>) resultSet.getArray(20),
-                        (ArrayList<Card>) resultSet.getArray(4),
-                        resultSet.getString(1234));
-            }
-            return weather;
-        } catch (SQLException e) {
-            throw new DataAccessException("Select nicht erfolgreich", e);
-        }
+        return userList.get(1);
     }
 
     @Override
-    public List<User> findAllUser() {
-        return userList;
-        /*try (PreparedStatement preparedStatement =
+    public Collection<User> findAllUser() {
+
+        //return userList;
+        try (PreparedStatement preparedStatement =
                      this.unitOfWork.prepareStatement("""
-                    select * from weather
-                    where region = ?
+                    select * from users
                 """))
         {
-            preparedStatement.setString(1, "Europe");
             ResultSet resultSet = preparedStatement.executeQuery();
-            Collection<User> weatherRows = new ArrayList<>();
-            while(resultSet.next())
-            {
-                User weather = new User(
-                        resultSet.getInt(1),
-                        resultSet.getString(2),
-                        resultSet.getString(3),
-                        resultSet.getInt(4),
-                        (ArrayList<Card>) resultSet.getArray(20),
-                        (ArrayList<Card>) resultSet.getArray(4),
-                        resultSet.getFloat(1234));
-                weatherRows.add(weather);
+            Collection<User> userCollection = new ArrayList<>();
+
+            while (resultSet.next()) {
+                User user = new User(
+                        resultSet.getInt("userID"),      // Column 1: userID
+                        resultSet.getString("username"), // Column 2: username
+                        resultSet.getString("password"), // Column 3: password
+                        resultSet.getInt("coins"),       // Column 4: coins
+                        resultSet.getString("token")     // Column 5: token
+                );
+                userCollection.add(user);
             }
 
-            return weatherRows;
+            System.out.println("All users selected");
+            return userCollection;
         } catch (SQLException e) {
             throw new DataAccessException("Select nicht erfolgreich", e);
-        }*/
+        }
     }
 
     @Override
@@ -91,35 +72,58 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByUsername(String username) {
-        if (username == null || username.isEmpty()) {
-            System.out.println("Invalid username provided for lookup.");
-            return null;
-        }
+        try (PreparedStatement preparedStatement =
+                     this.unitOfWork.prepareStatement("""
+                    SELECT * FROM users
+                    WHERE LOWER(username) = LOWER(?)
+                """)) {
+            preparedStatement.setString(1, username);
 
-        //System.out.println("Looking for username: " + username); //Debug
-
-        //userList.forEach(user1 -> System.out.println("Stored usernames: " + username)); //Debug
-
-        // Search for the user in the list
-        for (User user : userList) {
-            //System.out.println("Comparing with stored username: " + user.getUsername()); //Debug
-            if (user.getUsername().equalsIgnoreCase(username)) {
-                //System.out.println("Match found for username: " + username); //Debug
-                return user;
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) { // Check if a result exists
+                User user = new User(
+                        resultSet.getInt("userID"),      // Column 1: userID
+                        resultSet.getString("username"), // Column 2: username
+                        resultSet.getString("password"), // Column 3: password
+                        resultSet.getInt("coins"),       // Column 4: coins
+                        resultSet.getString("token")     // Column 5: token
+                );
+                System.out.println("User found: " + username);
+                return user; // Return the found user
+            } else {
+                System.out.println("No user with the given username found");
+                return null; // Return null if no user is found
             }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to fetch user by username", e);
         }
-
-        //System.out.println("No match found for username: " + username); //Debug
-        return null;
     }
-
 
 
     @Override
     public User saveUser(User user) {
+        //System.out.println("saveUser() entered"); //Debug
         //userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername())); //Debug
-        userList.add(user);
-        System.out.println("User is registered");
+        try (PreparedStatement preparedStatement =
+                     this.unitOfWork.prepareStatement("""
+                    INSERT INTO users (userID, username, password, coins)
+                    VALUES(?,?,?,?)
+                """))
+        {
+            preparedStatement.setInt(1, 1);
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setInt(4, 20);
+            //preparedStatement.setString(5, user.getPassword() + "-mtcgToken");
+            int rowsAffected  = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("User is registered");
+            } else {
+                System.out.println("No rows were inserted");
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Select nicht erfolgreich", e);
+        }
         //userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername())); //Debug
         return user;
     }

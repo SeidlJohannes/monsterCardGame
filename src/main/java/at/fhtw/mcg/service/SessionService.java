@@ -16,12 +16,8 @@ import java.io.IOException;
 
 public class SessionService extends AbstractService {
 
-    private final UserRepository userRepository;
+    private final UserRepository userRepository = new UserRepositoryImpl(new UnitOfWork());
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public SessionService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     // GET /user(:id
     public Response getSession(String id)

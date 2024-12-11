@@ -15,17 +15,16 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
 public class UserService extends AbstractService {
 
     private ObjectMapper objectMapper = new ObjectMapper();
-    private final UserRepository userRepository;
+    private final UserRepository userRepository = new UserRepositoryImpl(new UnitOfWork());
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    
 
     // GET /user(:id
     public Response getUser(String id)
@@ -68,7 +67,7 @@ public class UserService extends AbstractService {
             }
 
             // Überprüfen, ob der Benutzername bereits existiert
-            if (userRepository.existsByUsername(newUser.getUsername())) {
+            if (userRepository.findByUsername(newUser.getUsername()) != null) {
                 return new Response(HttpStatus.BAD_REQUEST, ContentType.JSON, "{\"error\": \"User already exists\"}");
             }
 
@@ -94,7 +93,7 @@ public class UserService extends AbstractService {
         //User user = new User(1,"user1","pw1", 20,new ArrayList<Card>(),new ArrayList<Card>(),1111);
         String json = null;
         try {
-            List<User> userJson = userRepository.findAllUser();
+            Collection<User> userJson = userRepository.findAllUser();
             //userJson.stream().forEach(user1 -> System.out.println(user1));
             json = this.getObjectMapper().writeValueAsString(userJson);
         } catch (JsonProcessingException e) {

@@ -21,12 +21,13 @@ public class User {
     private String password;
     @JsonAlias({"coins"})
     private Integer coins;
-    @JsonAlias({"stack"})
+    /*@JsonAlias({"stack"})
     private ArrayList<Card> stack; //after buying 4 packages contains 20 cards
     @JsonAlias({"deck"})
-    private ArrayList<Card> deck; //consists of 4 cards picked from stack
+    private ArrayList<Card> deck; //consists of 4 cards picked from stack*/
     @JsonAlias({"token"})
     private String token;
+
 
     private void buildDeck(){};
     private void buyPackage(){};

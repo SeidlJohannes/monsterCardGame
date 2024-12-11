@@ -11,9 +11,9 @@ public class McgDao {
 
     public McgDao() {
         userList = new ArrayList<>();
-        userList.add(new User(1,"user1","pw1", 20,new ArrayList<Card>(),new ArrayList<Card>(),"1111"));
-        userList.add(new User(2,"user2","pw2", 20,new ArrayList<Card>(),new ArrayList<Card>(),"2222"));
-        userList.add(new User(3,"user3","pw3", 20,new ArrayList<Card>(),new ArrayList<Card>(),"3333"));
+        //userList.add(new User(1,"user1","pw1", 20,new ArrayList<Card>(),new ArrayList<Card>(),"1111"));
+        //userList.add(new User(2,"user2","pw2", 20,new ArrayList<Card>(),new ArrayList<Card>(),"2222"));
+        //userList.add(new User(3,"user3","pw3", 20,new ArrayList<Card>(),new ArrayList<Card>(),"3333"));
     }
 
     // GET /weather/:id

@@ -12,8 +12,8 @@ import at.fhtw.mcg.service.SessionService;
 public class SessionController implements RestController {
     private final SessionService sessionService;
 
-    public SessionController(UserRepository userRepository) {
-        this.sessionService = new SessionService(userRepository);
+    public SessionController() {
+        this.sessionService = new SessionService();
     }
 
     @Override
