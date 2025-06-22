@@ -1,15 +1,9 @@
 package at.fhtw.mcg.persistence.repository;
 
-import at.fhtw.httpserver.server.Request;
-import at.fhtw.mcg.model.Card;
 import at.fhtw.mcg.model.User;
 import at.fhtw.mcg.persistence.DataAccessException;
 import at.fhtw.mcg.persistence.UnitOfWork;
-import at.fhtw.sampleapp.persistence.repository.WeatherRepository;
-import at.fhtw.sampleapp.persistence.repository.WeatherRepositoryImpl;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +25,27 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(int id) {
-        return userList.get(1);
+        try (PreparedStatement preparedStatement =
+                     this.unitOfWork.prepareStatement("""
+                    SELECT * FROM users
+                    WHERE userID = ?
+                """))
+        {
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return new User(
+                        resultSet.getInt("userID"),
+                        resultSet.getString("username"),
+                        resultSet.getString("password"),
+                        resultSet.getInt("coins"),
+                        resultSet.getString("token")
+                );
+            }
+            return null;
+        } catch (SQLException e) {
+            throw new DataAccessException("Select nicht erfolgreich", e);
+        }
     }
 
     @Override
@@ -66,8 +80,18 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public boolean existsByUsername(String username) {
-        return userList.stream()
-                .anyMatch(user -> user.getUsername().equalsIgnoreCase(username));
+        try (PreparedStatement preparedStatement =
+                     this.unitOfWork.prepareStatement("""
+                    SELECT 1 FROM users
+                    WHERE LOWER(username) = LOWER(?)
+                """))
+        {
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            throw new DataAccessException("Select nicht erfolgreich", e);
+        }
     }
 
     @Override
@@ -106,15 +130,13 @@ public class UserRepositoryImpl implements UserRepository {
         //userList.forEach(user1 -> System.out.println("Stored username: " + user.getUsername())); //Debug
         try (PreparedStatement preparedStatement =
                      this.unitOfWork.prepareStatement("""
-                    INSERT INTO users (userID, username, password, coins)
-                    VALUES(?,?,?,?)
+                    INSERT INTO users (username, password, coins)
+                    VALUES(?,?,?)
                 """))
         {
-            preparedStatement.setInt(1, 1);
-            preparedStatement.setString(2, user.getUsername());
-            preparedStatement.setString(3, user.getPassword());
-            preparedStatement.setInt(4, 20);
-            //preparedStatement.setString(5, user.getPassword() + "-mtcgToken");
+            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setInt(3, user.getCoins() != null ? user.getCoins() : 20);
             int rowsAffected  = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
                 System.out.println("User is registered");
@@ -130,7 +152,17 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void addToken(String username, String token) {
-        User foundUser = findByUsername(username);
-        foundUser.setToken(token);
+        try (PreparedStatement preparedStatement =
+                     this.unitOfWork.prepareStatement("""
+                    UPDATE users SET token = ?
+                    WHERE LOWER(username) = LOWER(?)
+                """))
+        {
+            preparedStatement.setString(1, token);
+            preparedStatement.setString(2, username);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Update nicht erfolgreich", e);
+        }
     }
 }
